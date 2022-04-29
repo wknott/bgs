@@ -4,6 +4,12 @@ import Result from './ResultInterface';
 const useStats = () => {
     const [results, setResults] = useState<Array<Result>>([]);
     const [month, setMonth] = useState<string>('2022-03');
+    const [sortPropertyName, setSortPropertyName] = useState<string>('playingTime');
+
+    const toggleSortPropertyName = () => {
+        setSortPropertyName(sortPropertyName === 'playingTime' ? 'numberOfResults' : 'playingTime');
+    };
+
     useEffect(() => {
         const getResults = async () => {
             const response = await fetch('https://wyniczek.herokuapp.com/api/results');
@@ -52,13 +58,20 @@ const useStats = () => {
                       ];
         });
 
-        return stats.sort((a, b) => (a.playingTime === b.playingTime ? 0 : a.playingTime > b.playingTime ? -1 : 1));
+        if (sortPropertyName === 'playingTime') {
+            return stats.sort((a, b) => (a.playingTime === b.playingTime ? 0 : a.playingTime > b.playingTime ? -1 : 1));
+        }
+
+        return stats.sort((a, b) =>
+            a.numberOfResults === b.numberOfResults ? 0 : a.numberOfResults > b.numberOfResults ? -1 : 1,
+        );
     };
 
     return {
         monthStats: getMonthStats(month),
         month,
         setMonth,
+        toggleSortPropertyName,
     };
 };
 
